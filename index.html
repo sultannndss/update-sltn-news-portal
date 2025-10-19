@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>UpdateSltn - Portal Berita (Pro)</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --primary:#007bff; --accent:#00bcd4; --accent-2:#001f3f;
+      --light-text:#212529; --dark-text:#f8f9fa;
+    }
+
+    body{
+      font-family:'Poppins',sans-serif;
+      color:var(--light-text);
+      padding-top:70px;
+      background: linear-gradient(-45deg,#007bff,#00bcd4,#001f3f,#00bcd4);
+      background-size:400% 400%;
+      animation: gradientMove 15s ease infinite;
+    }
+    @keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    body.dark-mode{ background: linear-gradient(-45deg,#0d0d0d,#1a1a1a,#001f3f,#222); color:var(--dark-text) }
+
+    /* navbar */
+    .navbar{ background-color: rgba(0,0,0,0.8) !important; backdrop-filter: blur(8px);}
+    .navbar-brand{ color:var(--accent) !important; font-weight:700; }
+    .nav-link{ color:#fff !important; }
+    .toggle-mode{ border:2px solid var(--accent); color:var(--accent); border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:transparent}
+    .toggle-mode:hover{ transform:rotate(20deg); background:var(--accent); color:#001f3f; }
+
+    /* hero */
+    .hero{ text-align:center; color:#fff; margin-top:40px; padding:80px 20px 40px; }
+    .hero h1{ font-size:2.8rem; font-weight:700; }
+    .hero p{ color: #e6f7ff; max-width:800px; margin:auto; }
+
+    /* cards */
+    .card{ border:none; border-radius:14px; overflow:hidden; transition:all .3s ease; }
+    .card:hover{ transform:translateY(-8px); box-shadow:0 12px 30px rgba(0,0,0,0.25) }
+    .card img{ height:200px; object-fit:cover; transition:transform .4s }
+    .card:hover img{ transform:scale(1.06) }
+
+    /* trending carousel caption */
+    .carousel-caption{ background:rgba(0,0,0,0.45); padding:10px; border-radius:8px; }
+
+    /* small widgets in navbar */
+    .nav-small{ font-size:.9rem; color:#bfefff; }
+
+    /* modal favorites */
+    .favorite-thumb{ width:100px; height:80px; object-fit:cover; border-radius:6px; }
+
+    /* comment area */
+    #commentList .comment{ border-bottom:1px solid #eee; padding:8px 0; }
+
+    /* responsive */
+    @media (max-width:576px){ .hero h1{ font-size:1.8rem } .card img{ height:160px } }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="home.html">UpdateSltn</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link" href="home.html"><i class="fas fa-home me-1"></i> Home</a></li>
+
+          <!-- dropdown kategori -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="fas fa-list me-1"></i> Kategori</a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item category-link" data-category="technology">Teknologi</a></li>
+              <li><a class="dropdown-item category-link" data-category="sports">Olahraga</a></li>
+              <li><a class="dropdown-item category-link" data-category="business">Bisnis</a></li>
+              <li><a class="dropdown-item category-link" data-category="politics">Politik</a></li>
+              <li><a class="dropdown-item category-link" data-category="health">Kesehatan</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item"><a class="nav-link active" href="index.html"><i class="fas fa-newspaper me-1"></i> Berita</a></li>
+
+          <!-- weather/time small -->
+          <li class="nav-item ms-3"><span id="weatherWidget" class="nav-link nav-small"></span></li>
+
+          <!-- favorites -->
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal"><i class="fas fa-heart me-1 text-danger"></i> Favorit <span id="favCount" class="badge bg-danger ms-1">0</span></a>
+          </li>
+
+          <!-- admin/login -->
+          <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fas fa-user me-1"></i> Login</a></li>
+
+          <!-- dark mode -->
+          <li class="nav-item ms-2"><button id="modeToggle" class="toggle-mode" title="Ganti Mode"><i class="fas fa-moon"></i></button></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero container text-center">
+    <h1>Berita Terupdate</h1>
+    <p>Temukan berita terbaru dan terhangat hari ini — cari topik, simpan favorit, baca nyaman, dan aktifkan notifikasi untuk update otomatis.</p>
+
+    <form id="searchForm" class="row g-2 justify-content-center mt-4">
+      <div class="col-11 col-md-8">
+        <div class="input-group">
+          <span class="input-group-text bg-white"><i class="fas fa-search text-primary"></i></span>
+          <input id="query" class="form-control" placeholder="Cari berita..." />
+          <button class="btn btn-primary" type="submit">Cari</button>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- TRENDING CAROUSEL -->
+  <section class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h4 class="text-light">🔥 Trending Hari Ini</h4>
+      <div>
+        <select id="sortSelect" class="form-select form-select-sm" style="width:auto;display:inline-block">
+          <option value="publishedAt">Terbaru</option>
+          <option value="popularity">Popularitas</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="trendingCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner" id="trendingSlides"></div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#trendingCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#trendingCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- NEWS GRID -->
+  <main class="container mb-5">
+    <div id="alertBox"></div>
+    <div id="loader" class="text-center my-5" style="display:none;">
+      <div class="spinner-border text-light" role="status" style="width:3rem;height:3rem"></div>
+    </div>
+
+    <div id="newsCards" class="row g-4"></div>
+
+    <!-- KOMENTAR -->
+    <section class="mt-5">
+      <h5 class="text-light">💬 Kolom Komentar</h5>
+      <div id="commentList" class="bg-white p-3 rounded mb-2" style="min-height:60px"></div>
+      <form id="commentForm" class="d-flex gap-2">
+        <input id="commentName" class="form-control" placeholder="Nama (opsional)" />
+        <input id="commentInput" class="form-control" placeholder="Tulis komentar..." />
+        <button class="btn btn-primary">Kirim</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-light py-4">
+    <small>© 2025 <strong>UpdateSltn</strong> — Portal Berita Terkini</small>
+  </footer>
+
+  <!-- MODALS -->
+
+  <!-- FAVORITES MODAL -->
+  <div class="modal fade" id="favoritesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Berita Favorit</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body" id="favoriteList"><p class="text-muted">Belum ada berita disimpan.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Login Admin</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <input id="username" class="form-control mb-2" placeholder="Username" />
+          <input id="password" type="password" class="form-control mb-3" placeholder="Password" />
+          <button id="loginBtn" class="btn btn-primary w-100">Masuk</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL MODAL (hanya muncul jika login) -->
+  <div class="modal fade" id="adminModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Admin — Tambah Berita Manual</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <input id="a_title" class="form-control mb-2" placeholder="Judul" />
+          <input id="a_source" class="form-control mb-2" placeholder="Sumber (nama)" />
+          <input id="a_image" class="form-control mb-2" placeholder="URL Gambar" />
+          <textarea id="a_desc" class="form-control mb-2" placeholder="Ringkasan"></textarea>
+          <input id="a_url" class="form-control mb-2" placeholder="URL Artikel" />
+          <div class="d-flex gap-2">
+            <button id="addArticleBtn" class="btn btn-success">Tambah & Simpan</button>
+            <button id="clearManualBtn" class="btn btn-danger">Hapus Semua Manual</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ========== CONFIG ==========
+    const API_KEY = '19ddede157ae43349c501c985a17d415'; // gunakan API keymu
+    const PROXY = "https://api.codetabs.com/v1/proxy?quest="; // proxy untuk CORS
+    const $newsCards = $('#newsCards'), $alertBox = $('#alertBox'), $loader = $('#loader');
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    let comments = JSON.parse(localStorage.getItem('comments')) || [];
+    let manualArticles = JSON.parse(localStorage.getItem('manualArticles')) || [];
+    let latestTitle = localStorage.getItem('latestTitle') || '';
+    let isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+    // ====== UTIL ======
+    function showError(msg){ $alertBox.html(`<div class="alert alert-warning text-center">${msg}</div>`); }
+    function showLoader(show){ $loader.toggle(show); }
+
+    // ====== FAVORITES ======
+    function toggleFavorite(article){
+      const exists = favorites.find(f => f.url === article.url);
+      if(exists){
+        favorites = favorites.filter(f => f.url !== article.url);
+      } else {
+        favorites.push(article);
+      }
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      updateFavCount();
+    }
+    function updateFavCount(){ $('#favCount').text(favorites.length); }
+    function showFavorites(){
+      const $fav = $('#favoriteList');
+      if(favorites.length === 0) return $fav.html(`<p class="text-muted">Belum ada berita disimpan.</p>`);
+      $fav.html(favorites.map(f=>`
+        <div class="d-flex gap-3 mb-3">
+          <img src="${f.urlToImage||'https://via.placeholder.com/120x80'}" class="favorite-thumb"/>
+          <div>
+            <h6>${f.title}</h6>
+            <p class="small text-muted">${f.description||''}</p>
+            <div class="d-flex gap-2">
+              <a href="${f.url}" target="_blank" class="btn btn-sm btn-primary">Baca</a>
+              <button class="btn btn-sm btn-danger remove-fav" data-url="${f.url}">Hapus</button>
+            </div>
+          </div>
+        </div>
+      `).join(''));
+    }
+    $(document).on('click', '.remove-fav', function(){ favorites = favorites.filter(f=>f.url !== $(this).data('url')); localStorage.setItem('favorites', JSON.stringify(favorites)); showFavorites(); updateFavCount(); });
+
+    // ====== COMMENTS ======
+    function showComments(){
+      const $list = $('#commentList');
+      if(comments.length===0) return $list.html('<p class="text-muted">Belum ada komentar.</p>');
+      $list.html(comments.map(c=>`<div class="comment"><strong>${c.name||'Pengunjung'}</strong> <small class="text-muted">— ${new Date(c.time).toLocaleString()}</small><div>${c.text}</div></div>`).join(''));
+    }
+    $('#commentForm').on('submit', function(e){
+      e.preventDefault();
+      const name = $('#commentName').val().trim() || 'Pengunjung';
+      const text = $('#commentInput').val().trim();
+      if(!text) return alert('Masukkan komentar dulu.');
+      comments.unshift({name, text, time: Date.now()});
+      localStorage.setItem('comments', JSON.stringify(comments));
+      $('#commentInput').val(''); $('#commentName').val('');
+      showComments();
+    });
+
+    // ====== TRENDING ======
+    function loadTrending(sort='publishedAt'){
+      const url = `https://newsapi.org/v2/top-headlines?country=id&pageSize=5&apiKey=${API_KEY}&sortBy=${sort}`;
+      $.get(PROXY + encodeURIComponent(url))
+        .done(res=>{
+          let data; try{ data = JSON.parse(res); }catch{ data=res; }
+          if(!data.articles) return;
+          const slides = data.articles.map((a,i)=>`
+            <div class="carousel-item ${i===0?'active':''}">
+              <img src="${a.urlToImage||'https://via.placeholder.com/1200x300'}" class="d-block w-100" style="height:300px;object-fit:cover" alt="">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>${a.title}</h5>
+                <p class="small">${a.source.name||''}</p>
+                <a href="${a.url}" target="_blank" class="btn btn-sm btn-light">Baca</a>
+              </div>
+            </div>
+          `).join('');
+          $('#trendingSlides').html(slides);
+        }).fail(()=>{ /* ignore errors */ });
+    }
+
+    // ====== FETCH NEWS (search & category) ======
+    function displayNews(articles){
+      $newsCards.empty();
+      // merge manualArticles at top
+      const merged = [...manualArticles, ...articles];
+      if(merged.length===0){ showError('Tidak ada berita ditemukan.'); return; }
+      merged.forEach((article,i)=>{
+        const img = article.urlToImage || 'https://via.placeholder.com/400x220?text=No+Image';
+        const desc = (article.description || '').substring(0,140);
+        const date = article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) : '';
+        const isFav = favorites.some(f=>f.url === article.url);
+        $newsCards.append(`
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+              <img src="${img}" class="card-img-top" alt="">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">${article.title}</h5>
+                <p class="card-text small">${desc}...</p>
+                <div class="mt-auto d-flex gap-2">
+                  <a href="${article.url}" target="_blank" class="btn btn-primary btn-sm">Baca</a>
+                  <button class="btn btn-outline-danger btn-sm fav-btn" data-url="${article.url}" data-title="${escapeHtml(article.title)}"> ${isFav? '♥ Disimpan' : '♡ Simpan'}</button>
+                </div>
+              </div>
+              <div class="card-footer small text-muted">${article.source?.name||''} ${date ? ' - ' + date : ''}</div>
+            </div>
+          </div>
+        `);
+      });
+    }
+
+    function fetchNews(query){
+      if(!query) query = 'Indonesia';
+      showLoader(true);
+      $alertBox.empty();
+      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=id&pageSize=30&apiKey=${API_KEY}`;
+      $.get(PROXY + encodeURIComponent(url))
+        .done(res=>{
+          let data; try{ data = JSON.parse(res); }catch{ data=res; }
+          if(!data.articles || data.articles.length===0){ displayNews([]); showLoader(false); showError(`Tidak ada berita untuk "${query}".`); return; }
+          displayNews(data.articles);
+          // update latestTitle for notifications
+          if(data.articles[0]?.title && !latestTitle){ latestTitle = data.articles[0].title; localStorage.setItem('latestTitle', latestTitle); }
+        })
+        .fail(()=> showError('Gagal memuat berita.'))
+        .always(()=> showLoader(false));
+    }
+
+    // helper escape for data attribute
+    function escapeHtml(str){ return String(str).replace(/"/g,'&quot;').replace(/'/g,"&#39;"); }
+
+    // handle favorite button click
+    $(document).on('click', '.fav-btn', function(){
+      const url = $(this).data('url');
+      const title = $(this).data('title');
+      // find article object from displayed cards / fetch minimal object
+      // For simplicity, create article object with url and title (better when full object exists)
+      const article = { url, title, urlToImage: $(this).closest('.card').find('img').attr('src'), description: $(this).closest('.card').find('.card-text').text(), source: {name: ''} };
+      toggleFavorite(article);
+      showFavorites(); updateFavCount();
+      // update button text
+      const isFav = favorites.some(f=>f.url === url);
+      $(this).text(isFav ? '♥ Disimpan' : '♡ Simpan');
+    });
+
+    // ====== NOTIFICATIONS: check new top headline every minute ======
+    function checkNewNews(){
+      const url = `https://newsapi.org/v2/top-headlines?country=id&pageSize=1&apiKey=${API_KEY}`;
+      $.get(PROXY + encodeURIComponent(url)).done(res=>{
+        let data; try{ data=JSON.parse(res); }catch{ data=res; }
+        if(!data.articles || !data.articles[0]) return;
+        const latest = data.articles[0].title;
+        if(latestTitle && latest !== latestTitle){
+          // show transient alert
+          const $a = $(`<div class="alert alert-info position-fixed top-0 start-50 translate-middle-x mt-3 w-75 text-center">🆕 Berita baru: <strong>${latest}</strong></div>`);
+          $('body').append($a);
+          setTimeout(()=> $a.fadeOut(400, ()=> $a.remove()), 5000);
+        }
+        latestTitle = latest;
+        localStorage.setItem('latestTitle', latestTitle);
+      });
+    }
+
+    // ====== WEATHER & CLOCK ======
+    function loadWeather(){
+      if(!navigator.geolocation) return $('#weatherWidget').text('Cuaca tidak tersedia');
+      navigator.geolocation.getCurrentPosition(pos=>{
+        const lat = pos.coords.latitude, lon = pos.coords.longitude;
+        $.get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`).done(res=>{
+          const t = res.current_weather.temperature;
+          const code = res.current_weather.weathercode;
+          const emoji = code < 3 ? '☀️' : code < 60 ? '⛅' : '🌧️';
+          const time = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+          $('#weatherWidget').html(`${emoji} ${t}°C • ${time}`);
+        }).fail(()=> $('#weatherWidget').text('Cuaca error'));
+      }, ()=> $('#weatherWidget').text('Izin lokasi diminta'));
+    }
+
+    // ====== ADMIN LOGIN & manual article ======
+    $('#loginBtn').on('click', ()=>{
+      const user = $('#username').val().trim(), pass = $('#password').val().trim();
+      if(user === 'admin' && pass === '12345'){
+        localStorage.setItem('isAdmin','true'); isAdmin = true;
+        $('#loginModal').modal('hide');
+        // open admin modal
+        const admModal = new bootstrap.Modal(document.getElementById('adminModal'));
+        admModal.show();
+      } else {
+        alert('Username / password salah (default admin / 12345).');
+      }
+    });
+
+    $('#addArticleBtn').on('click', ()=>{
+      const a = { title: $('#a_title').val().trim(), source:{name: $('#a_source').val().trim()}, urlToImage: $('#a_image').val().trim(), description: $('#a_desc').val().trim(), url: $('#a_url').val().trim(), publishedAt: new Date().toISOString() };
+      if(!a.title || !a.url) return alert('Judul dan URL wajib diisi.');
+      manualArticles.unshift(a);
+      localStorage.setItem('manualArticles', JSON.stringify(manualArticles));
+      alert('Berita manual tersimpan.');
+      $('#a_title,#a_source,#a_image,#a_desc,#a_url').val('');
+      fetchNews($('#query').val().trim() || 'Indonesia');
+    });
+
+    $('#clearManualBtn').on('click', ()=>{
+      if(!confirm('Hapus semua berita manual?')) return;
+      manualArticles = []; localStorage.removeItem('manualArticles'); fetchNews($('#query').val().trim() || 'Indonesia');
+    });
+
+    // ====== UI interactions ======
+    $('#searchForm').on('submit', function(e){ e.preventDefault(); const q = $('#query').val().trim(); if(!q) return showError('Masukkan kata kunci terlebih dahulu.'); fetchNews(q); loadTrending(); });
+    $('.category-link').on('click', function(){ const cat = $(this).data('category'); fetchNews(cat); loadTrending(); });
+
+    $('#modeToggle').on('click', function(){ $('body').toggleClass('dark-mode'); const i = $(this).find('i'); i.toggleClass('fa-moon fa-sun'); });
+
+    $('#trendingCarousel').on('slid.bs.carousel', ()=>{}); // placeholder
+
+    // ====== INIT ======
+    $(document).ready(function(){
+      updateFavCount(); showFavorites(); showComments(); loadWeather();
+      // initial loads
+      loadTrending();
+      fetchNews(new URLSearchParams(window.location.search).get('q') || 'Indonesia');
+      // periodic tasks
+      setInterval(checkNewNews, 60000); // cek tiap 60s
+      setInterval(loadWeather, 60000); // update cuaca tiap 60s
+    });
+
+    // small helper: when favorites modal opens, refresh list
+    $('#favoritesModal').on('show.bs.modal', showFavorites);
+
+  </script>
+</body>
+</html>

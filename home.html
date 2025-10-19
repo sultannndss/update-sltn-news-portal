@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UpdateSltn - Beranda</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #007bff;
+      --secondary: #001f3f;
+      --accent: #00bcd4;
+      --light-text: #212529;
+      --dark-text: #f8f9fa;
+    }
+
+    /* Background animasi sama seperti index */
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--light-text);
+      background: linear-gradient(-45deg, #007bff, #00bcd4, #001f3f, #00bcd4);
+      background-size: 400% 400%;
+      animation: gradientMove 15s ease infinite;
+      padding-top: 70px;
+      transition: all 0.4s ease;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    body.dark-mode {
+      background: linear-gradient(-45deg, #0d0d0d, #1a1a1a, #001f3f, #222);
+      background-size: 400% 400%;
+      animation: gradientMove 20s ease infinite;
+      color: var(--dark-text);
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: rgba(0,0,0,0.8) !important;
+      backdrop-filter: blur(10px);
+      transition: all 0.4s ease;
+    }
+    .navbar-brand {
+      font-weight: 700;
+      color: var(--accent) !important;
+      letter-spacing: 1px;
+    }
+    .nav-link {
+      color: #fff !important;
+      margin: 0 5px;
+      transition: 0.3s ease;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--accent) !important;
+      transform: translateY(-2px);
+    }
+
+    /* Tombol mode */
+    .toggle-mode {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    .toggle-mode:hover {
+      background-color: var(--accent);
+      color: var(--secondary);
+      transform: rotate(20deg);
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      color: #fff;
+      margin-top: 50px;
+      padding: 120px 20px;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 30px;
+      color: #f1f1f1;
+    }
+    .hero .btn {
+      border-radius: 30px;
+      padding: 12px 28px;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    /* Kategori tombol */
+    .category-buttons {
+      margin-top: 40px;
+    }
+    .category-buttons .btn {
+      margin: 8px;
+      border-radius: 25px;
+      border: 2px solid var(--accent);
+      color: #fff;
+      background: transparent;
+      transition: 0.3s;
+      font-weight: 600;
+    }
+    .category-buttons .btn:hover {
+      background-color: var(--accent);
+      color: var(--secondary);
+      transform: translateY(-2px);
+    }
+
+    /* Footer */
+    footer {
+      background-color: rgba(0,0,0,0.85);
+      color: #fff;
+      text-align: center;
+      padding: 40px 0;
+      margin-top: 60px;
+      backdrop-filter: blur(5px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="home.html">UpdateSltn</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link active" href="home.html"><i class="fas fa-home me-1"></i> Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-newspaper me-1"></i> Berita</a></li>
+          <li class="nav-item ms-3">
+            <button id="modeToggle" class="toggle-mode" title="Ganti Mode"><i class="fas fa-moon"></i></button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Selamat Datang di <span style="color:var(--accent);">UpdateSltn</span></h1>
+    <p>Portal berita terkini yang menyajikan informasi terbaru dari dunia teknologi, bisnis, olahraga, politik, dan hiburan.</p>
+    <a href="index.html" class="btn btn-light btn-lg rounded-pill">
+      <i class="fas fa-arrow-right me-2"></i> Lihat Berita Terbaru
+    </a>
+
+    <div class="category-buttons">
+      <a href="index.html?category=technology" class="btn">Teknologi</a>
+      <a href="index.html?category=sports" class="btn">Olahraga</a>
+      <a href="index.html?category=business" class="btn">Bisnis</a>
+      <a href="index.html?category=politics" class="btn">Politik</a>
+      <a href="index.html?category=health" class="btn">Kesehatan</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 <strong>UpdateSltn</strong> | Portal Berita Terkini dan Terpercaya</p>
+  </footer>
+
+  <!-- Script -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const toggle = document.getElementById('modeToggle');
+    toggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const icon = toggle.querySelector('i');
+      icon.classList.toggle('fa-moon');
+      icon.classList.toggle('fa-sun');
+    });
+  </script>
+</body>
+</html>
